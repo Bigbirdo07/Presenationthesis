@@ -173,10 +173,15 @@ function goTo(n) {
   if (el) el.classList.add('active');
   document.getElementById('progress-bar').style.width = ((cur+1)/TOTAL*100) + '%';
   animateSlide(el);
-  if (cur === 24) {
+  if (cur === 26) {
     setTimeout(startSVM, 600);
   } else {
     stopSVM();
+  }
+  if (cur === 32) {
+    setTimeout(startBTN, 400);
+  } else {
+    stopBTN();
   }
 }
 function nextSlide() { if (cur < TOTAL-1) goTo(cur+1); else showEnd(); }
@@ -425,7 +430,7 @@ function stopSVM() {
 function runSVMStep(step) {
   if (step >= 6) {
     // pause then restart
-    const t = setTimeout(function(){ runSVMStep(0); }, 3000);
+    const t = setTimeout(function(){ runSVMStep(0); }, 4000);
     svmTimers.push(t);
     return;
   }
@@ -453,7 +458,7 @@ function runSVMStep(step) {
     if (scanInterval) { clearInterval(scanInterval); scanInterval = null; }
     if (cInterval) { clearInterval(cInterval); cInterval = null; }
   }
-  const durations = [2500, 2500, 2500, 3000, 4000, 5000];
+  const durations = [3000, 3000, 3000, 3500, 5000, 6000];
   const t = setTimeout(function(){ runSVMStep(step+1); }, durations[step]);
   svmTimers.push(t);
 }
@@ -477,6 +482,411 @@ function startSVM() {
     });
     runSVMStep(0);
   }, 80);
+}
+
+// ─── BTN Hallmarks Animation ─────────────────────────────────────────────────
+var btnRAF = null;
+var btnTimers = [];
+var btnState = {};
+
+var BTN_PHASES = [
+  { name:'Immune Evasion',         sub:'BTN cells cloak themselves — immune cells cannot recognize them',    color:'#AFEEEE', tc:'#0C447C' },
+  { name:'Cell Migration',          sub:'Neoplastic cells actively spread through the hemolymph',             color:'#E6E6FA', tc:'#3C3489' },
+  { name:'Apoptosis Inhibition',    sub:'BTN cells resist programmed cell death — normal cells do not',       color:'#98FF98', tc:'#27500A' },
+  { name:'Autophagy Upregulation',  sub:'Internal recycling of cellular components fuels rapid clonal growth', color:'#E6E6FA', tc:'#3C3489' },
+  { name:'Warburg Effect',          sub:'Glucose is converted to ATP by aerobic glycolysis — metabolism reprogrammed', color:'#F5C842', tc:'#412402' }
+];
+
+function stopBTN() {
+  if (btnRAF) { cancelAnimationFrame(btnRAF); btnRAF = null; }
+  btnTimers.forEach(clearTimeout);
+  btnTimers = [];
+}
+
+function startBTN() {
+  stopBTN();
+  var canvas = document.getElementById('btn-canvas');
+  if (!canvas) return;
+  var rect = canvas.getBoundingClientRect();
+  var dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  var ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  var W = rect.width, H = rect.height;
+  btnState = { phase:-1, phaseStart:0, phaseDur:4800, ctx:ctx, W:W, H:H, cells:[], normals:[], pd:{} };
+  initBTNPhase(0, performance.now());
+  btnRAF = requestAnimationFrame(btnLoop);
+}
+
+function initBTNPhase(phase, now) {
+  var s = btnState, cx = s.W/2, cy = s.H/2;
+  s.phase = phase;
+  s.phaseStart = now;
+  s.cells = [];
+  s.normals = [];
+  s.pd = {};
+  updateBTNBar(phase);
+
+  if (phase === 0) {
+    s.cells = [
+      {x:cx-28,y:cy-18,r:12,ct:0.0},
+      {x:cx+14,y:cy+16,r:11,ct:0.35},
+      {x:cx-6, y:cy+2, r:13,ct:0.65}
+    ];
+    s.normals = [
+      {x:s.W*0.84,y:cy-32,vx:-1.3,vy:0.3, deflected:false,dvx:0,dvy:0},
+      {x:s.W*0.87,y:cy+8, vx:-1.2,vy:0.0, deflected:false,dvx:0,dvy:0},
+      {x:s.W*0.81,y:cy+38,vx:-1.1,vy:-0.2,deflected:false,dvx:0,dvy:0}
+    ];
+  } else if (phase === 1) {
+    s.cells = [
+      {x:s.W*0.14,y:cy-22,vx:1.9,vy:0.25,trail:[]},
+      {x:s.W*0.11,y:cy+18,vx:1.7,vy:-0.2,trail:[]},
+      {x:s.W*0.86,y:cy-5, vx:-1.6,vy:0.3, trail:[],incoming:true,opacity:0}
+    ];
+  } else if (phase === 2) {
+    s.cells = [
+      {x:cx+65,y:cy-18,r:12,hitT:-1,flashAlpha:0,survived:false},
+      {x:cx+35,y:cy+28,r:11,hitT:-1,flashAlpha:0,survived:false}
+    ];
+    s.normals = [{x:cx-55,y:cy,r:9,hitT:-1,scale:1,opacity:1,dead:false}];
+    s.pd = {origin:{x:s.W*0.08,y:cy},pulses:[],fired:false};
+  } else if (phase === 3) {
+    s.cells = [
+      {x:cx-55,y:cy+5, r:11,gr:11,vesicles:genV(4)},
+      {x:cx+18,y:cy-28,r:12,gr:12,vesicles:genV(4)},
+      {x:cx+58,y:cy+22,r:10,gr:10,vesicles:genV(3)}
+    ];
+  } else if (phase === 4) {
+    s.cells = [
+      {x:cx-52,y:cy-8, r:12,gp:0.0},
+      {x:cx+42,y:cy-22,r:11,gp:1.1},
+      {x:cx+8, y:cy+30,r:12,gp:2.2}
+    ];
+    s.pd = {glucose:[],atp:[],tick:0};
+  }
+}
+
+function genV(n) {
+  var v = [];
+  for (var i=0;i<n;i++) v.push({a:(Math.PI*2/n)*i + Math.random()*0.3, spd:0.04+Math.random()*0.02, r:2.5+Math.random()*0.8});
+  return v;
+}
+
+function updateBTNBar(phase) {
+  var bar = document.getElementById('btn-phase-bar');
+  if (!bar) return;
+  bar.innerHTML = BTN_PHASES.map(function(p,i) {
+    var on = i===phase, done = i<phase;
+    var bg = on ? 'rgba(175,238,238,0.25)' : 'rgba(245,247,250,0.7)';
+    var bd = on ? p.color : 'rgba(175,238,238,0.25)';
+    var fw = on ? '600' : '400';
+    var col = on ? p.tc : '#5a8099';
+    return '<div style="padding:3px 9px;border-radius:20px;font-size:0.6em;font-weight:'+fw+';color:'+col+';background:'+bg+';border:1px solid '+bd+';transition:all 0.4s;white-space:nowrap">'+p.name+'</div>';
+  }).join('');
+}
+
+function btnLoop(now) {
+  var s = btnState;
+  if (!s.ctx) return;
+  var elapsed = now - s.phaseStart;
+  var t = Math.min(elapsed / s.phaseDur, 1.0);
+  drawBTNFrame(t, now);
+  if (elapsed >= s.phaseDur) {
+    var next = (s.phase + 1) % BTN_PHASES.length;
+    if (next === 0) {
+      var tid = setTimeout(function(){ initBTNPhase(0, performance.now()); btnRAF = requestAnimationFrame(btnLoop); }, 2000);
+      btnTimers.push(tid);
+      return;
+    }
+    initBTNPhase(next, now);
+  }
+  btnRAF = requestAnimationFrame(btnLoop);
+}
+
+function drawBTNFrame(t, now) {
+  var s = btnState, ctx = s.ctx, W = s.W, H = s.H, ph = BTN_PHASES[s.phase];
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  var bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#fafeff'); bg.addColorStop(1,'#f0f8ff');
+  ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+  // Subtle fluid lines
+  ctx.save(); ctx.globalAlpha = 0.04;
+  for (var li=0;li<6;li++) {
+    ctx.beginPath();
+    ctx.moveTo(0, H*(0.2+li*0.12));
+    ctx.bezierCurveTo(W*0.3, H*(0.18+li*0.12-0.04), W*0.7, H*(0.22+li*0.12+0.03), W, H*(0.2+li*0.12));
+    ctx.strokeStyle='#AFEEEE'; ctx.lineWidth=1.5; ctx.stroke();
+  }
+  ctx.restore();
+
+  // Phase label — fade in
+  var la = Math.min(t*5,1);
+  ctx.save(); ctx.globalAlpha=la;
+  ctx.font='bold '+Math.round(W*0.030)+'px -apple-system,sans-serif';
+  ctx.fillStyle='#2D2D2D'; ctx.textAlign='center';
+  ctx.fillText(ph.name, W/2, H*0.13);
+  ctx.font=Math.round(W*0.019)+'px -apple-system,sans-serif';
+  ctx.fillStyle='#5a8099';
+  ctx.fillText(ph.sub, W/2, H*0.13 + Math.round(W*0.030) + 5);
+  ctx.restore();
+
+  // Phase progress bar
+  ctx.fillStyle='rgba(175,238,238,0.2)'; ctx.fillRect(W*0.08,H*0.88,W*0.84,3);
+  ctx.fillStyle=ph.color; ctx.fillRect(W*0.08,H*0.88,W*0.84*t,3);
+
+  // Phase content
+  if (s.phase===0) btnEvasion(t,now);
+  else if (s.phase===1) btnMigration(t,now);
+  else if (s.phase===2) btnApoptosis(t,now);
+  else if (s.phase===3) btnAutophagy(t,now);
+  else if (s.phase===4) btnWarburg(t,now);
+}
+
+function dBTN(ctx,x,y,r,glow) {
+  if (glow>0) {
+    var g=ctx.createRadialGradient(x,y,r*0.5,x,y,r*2.4);
+    g.addColorStop(0,'rgba(144,120,210,'+glow+')'); g.addColorStop(1,'rgba(144,120,210,0)');
+    ctx.beginPath(); ctx.arc(x,y,r*2.4,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+  }
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle='rgba(180,140,220,0.82)'; ctx.fill();
+  ctx.strokeStyle='#7F77DD'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.beginPath(); ctx.arc(x,y,r*0.38,0,Math.PI*2);
+  ctx.fillStyle='rgba(127,119,221,0.55)'; ctx.fill();
+}
+
+function dNorm(ctx,x,y,r,op) {
+  ctx.globalAlpha=op!==undefined?op:1;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle='#AFEEEE'; ctx.fill();
+  ctx.strokeStyle='#185FA5'; ctx.lineWidth=1.2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(x,y,r*0.35,0,Math.PI*2);
+  ctx.fillStyle='rgba(24,95,165,0.35)'; ctx.fill();
+  ctx.globalAlpha=1;
+}
+
+function btnEvasion(t,now) {
+  var s=btnState,ctx=s.ctx,W=s.W,H=s.H,time=now/1000;
+  var shieldCycle=(time*0.7)%1;
+
+  // Shield pulses around BTN cluster
+  s.cells.forEach(function(c){
+    var sc=(shieldCycle+c.ct)%1;
+    var sa=Math.max(0,(1-sc*2.2)*0.28);
+    var sr=c.r+6+sc*38;
+    ctx.beginPath(); ctx.arc(c.x,c.y,sr,0,Math.PI*2);
+    ctx.strokeStyle='rgba(175,238,238,'+sa+')'; ctx.lineWidth=2; ctx.stroke();
+    dBTN(ctx,c.x,c.y,c.r,0);
+  });
+
+  // Normal cells approach then deflect
+  s.normals.forEach(function(n){
+    var nearDist=Infinity;
+    s.cells.forEach(function(c){ var d=Math.hypot(n.x-c.x,n.y-c.y); if(d<nearDist)nearDist=d; });
+    if(!n.deflected && nearDist<85){ n.deflected=true; n.dvx=Math.abs(n.vx)*0.4; n.dvy=(n.y>H/2?1.4:-1.4); }
+    if(n.deflected){ n.vx=n.dvx; n.vy=n.dvy; }
+    n.x+=n.vx; n.y+=n.vy;
+    dNorm(ctx,n.x,n.y,9,1);
+    if(n.deflected) {
+      ctx.globalAlpha=0.65;
+      ctx.font='bold '+Math.round(W*0.020)+'px sans-serif';
+      ctx.fillStyle='#5a8099'; ctx.textAlign='center';
+      ctx.fillText('?',n.x,n.y-13);
+      ctx.globalAlpha=1;
+    }
+  });
+
+  if(t>0.45){
+    var a=Math.min((t-0.45)*3,1);
+    ctx.globalAlpha=a; ctx.fillStyle='#0C447C';
+    ctx.font=Math.round(W*0.018)+'px -apple-system,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('immune cells deflect — BTN surface mimics self',W*0.5,H*0.79);
+    ctx.globalAlpha=1;
+  }
+}
+
+function btnMigration(t,now) {
+  var s=btnState,ctx=s.ctx,W=s.W,H=s.H;
+  s.cells.forEach(function(c){
+    if(c.incoming){ c.opacity=Math.min((c.opacity||0)+0.02,1); }
+    c.x+=c.vx; c.y+=c.vy;
+    if(!c.trail)c.trail=[];
+    c.trail.push({x:c.x,y:c.y});
+    if(c.trail.length>22)c.trail.shift();
+    c.trail.forEach(function(pt,i){
+      var al=(i/c.trail.length)*0.25;
+      ctx.beginPath(); ctx.arc(pt.x,pt.y,5*al+1,0,Math.PI*2);
+      ctx.fillStyle='rgba(144,120,210,'+al+')'; ctx.fill();
+    });
+    ctx.globalAlpha=c.incoming?c.opacity:1;
+    dBTN(ctx,c.x,c.y,12,0);
+    // Arrow
+    var dir=c.vx>0?1:-1;
+    ctx.globalAlpha=0.5; ctx.strokeStyle='#7F77DD'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(c.x+dir*(12+4),c.y); ctx.lineTo(c.x+dir*(12+16),c.y); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(c.x+dir*(12+16),c.y);
+    ctx.lineTo(c.x+dir*(12+10),c.y-4);
+    ctx.lineTo(c.x+dir*(12+10),c.y+4);
+    ctx.closePath(); ctx.fillStyle='#7F77DD'; ctx.fill();
+    ctx.globalAlpha=1;
+  });
+  if(t>0.35){
+    var a=Math.min((t-0.35)*3,1);
+    ctx.globalAlpha=a; ctx.fillStyle='#3C3489';
+    ctx.font=Math.round(W*0.018)+'px -apple-system,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('BTN cells migrate — spreading through hemolymph',W*0.5,H*0.79);
+    ctx.globalAlpha=1;
+  }
+}
+
+function btnApoptosis(t,now) {
+  var s=btnState,ctx=s.ctx,W=s.W,H=s.H,pd=s.pd;
+  // Fire pulse at t=0.18
+  if(!pd.fired&&t>=0.18){
+    pd.fired=true;
+    pd.pulses.push({startT:now});
+    s.normals[0].hitT=now+500;
+    s.cells.forEach(function(c){c.hitT=now+700;});
+  }
+  // Draw pulses
+  pd.pulses.forEach(function(p){
+    var pt=(now-p.startT)/1400;
+    var pr=pt*W*0.65;
+    var pa=Math.max(0,(1-pt)*0.38);
+    ctx.beginPath(); ctx.arc(pd.origin.x,pd.origin.y,pr,0,Math.PI*2);
+    ctx.strokeStyle='rgba(224,85,85,'+pa+')'; ctx.lineWidth=2; ctx.stroke();
+  });
+  // Death signal source
+  ctx.beginPath(); ctx.arc(pd.origin.x,pd.origin.y,7,0,Math.PI*2);
+  ctx.fillStyle='rgba(224,85,85,0.7)'; ctx.fill();
+  ctx.font=Math.round(W*0.016)+'px -apple-system,sans-serif';
+  ctx.fillStyle='#E05555'; ctx.textAlign='center';
+  ctx.fillText('death signal',pd.origin.x,pd.origin.y-13);
+
+  // Normal cell dying
+  s.normals.forEach(function(n){
+    if(n.hitT>0&&now>n.hitT){
+      var dt=Math.min((now-n.hitT)/900,1);
+      n.scale=1-dt; n.opacity=1-dt;
+      if(n.scale>0.02){
+        ctx.save(); ctx.translate(n.x,n.y); ctx.scale(n.scale,n.scale); ctx.translate(-n.x,-n.y);
+        dNorm(ctx,n.x,n.y,n.r,n.opacity); ctx.restore();
+        if(dt>0.3){
+          for(var i=0;i<4;i++){
+            var ang=(i/4)*Math.PI*2+dt*8;
+            ctx.beginPath(); ctx.arc(n.x+Math.cos(ang)*n.r*dt*2.5, n.y+Math.sin(ang)*n.r*dt*2.5,2,0,Math.PI*2);
+            ctx.fillStyle='rgba(24,95,165,'+(1-dt)+')'; ctx.fill();
+          }
+        }
+      } else if(t>0.72){
+        var a=Math.min((t-0.72)*4,1); ctx.globalAlpha=a;
+        ctx.fillStyle='#5a8099'; ctx.font=Math.round(W*0.016)+'px -apple-system,sans-serif';
+        ctx.textAlign='center'; ctx.fillText('✓ apoptosis',n.x,n.y+4);
+        ctx.globalAlpha=1;
+      }
+    } else { dNorm(ctx,n.x,n.y,n.r||9,1); }
+  });
+
+  // BTN cells surviving
+  s.cells.forEach(function(c){
+    if(c.hitT>0&&now>c.hitT){
+      var ht=Math.min((now-c.hitT)/700,1);
+      c.flashAlpha=ht<1?Math.sin(ht*Math.PI)*0.55:0;
+      if(!c.survived&&ht>=1)c.survived=true;
+      dBTN(ctx,c.x,c.y,c.r,0);
+      if(c.flashAlpha>0){
+        ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+        ctx.fillStyle='rgba(224,85,85,'+c.flashAlpha+')'; ctx.fill();
+      }
+      if(c.survived&&t>0.72){
+        var a=Math.min((t-0.72)*4,1); ctx.globalAlpha=a;
+        ctx.fillStyle='#27500A'; ctx.font='bold '+Math.round(W*0.016)+'px -apple-system,sans-serif';
+        ctx.textAlign='center'; ctx.fillText('✗ blocked',c.x,c.y-c.r-7);
+        ctx.globalAlpha=1;
+      }
+    } else { dBTN(ctx,c.x,c.y,c.r||12,0); }
+  });
+}
+
+function btnAutophagy(t,now) {
+  var s=btnState,ctx=s.ctx,W=s.W,H=s.H,time=now/1000;
+  s.cells.forEach(function(c){
+    var grow=1+t*0.38;
+    var cr=c.gr*grow;
+    dBTN(ctx,c.x,c.y,cr,0);
+    c.vesicles.forEach(function(v){
+      v.a+=v.spd;
+      var orb=cr*0.58;
+      var vx=c.x+Math.cos(v.a)*orb, vy=c.y+Math.sin(v.a)*orb;
+      ctx.beginPath(); ctx.arc(vx,vy,v.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(100,190,140,0.9)'; ctx.fill();
+      ctx.strokeStyle='rgba(40,130,70,0.5)'; ctx.lineWidth=0.8; ctx.stroke();
+    });
+  });
+  if(t>0.4){
+    var a=Math.min((t-0.4)*3,1); ctx.globalAlpha=a;
+    ctx.fillStyle='#3C3489'; ctx.font=Math.round(W*0.018)+'px -apple-system,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('vesicles (green) recycle internal material → cells grow',W*0.5,H*0.79);
+    ctx.globalAlpha=1;
+  }
+}
+
+function btnWarburg(t,now) {
+  var s=btnState,ctx=s.ctx,W=s.W,H=s.H,time=now/1000,pd=s.pd;
+  pd.tick++;
+  if(pd.tick%18===0){
+    var edge=Math.random();
+    var gx,gy,target=s.cells[Math.floor(Math.random()*s.cells.length)];
+    if(edge<0.25){gx=Math.random()*W;gy=H*0.22;}
+    else if(edge<0.5){gx=W*0.95;gy=H*0.22+Math.random()*H*0.55;}
+    else if(edge<0.75){gx=Math.random()*W;gy=H*0.8;}
+    else{gx=W*0.05;gy=H*0.22+Math.random()*H*0.55;}
+    var dx=target.x-gx,dy=target.y-gy,d=Math.hypot(dx,dy);
+    pd.glucose.push({x:gx,y:gy,vx:dx/d*2.2,vy:dy/d*2.2,life:1});
+  }
+  s.cells.forEach(function(c){
+    var pulse=(Math.sin(time*1.8+c.gp)+1)/2;
+    var gi=0.18+pulse*0.18;
+    var gr=ctx.createRadialGradient(c.x,c.y,c.r,c.x,c.y,c.r*3.0);
+    gr.addColorStop(0,'rgba(245,200,66,'+gi+')'); gr.addColorStop(1,'rgba(245,200,66,0)');
+    ctx.beginPath(); ctx.arc(c.x,c.y,c.r*3.0,0,Math.PI*2); ctx.fillStyle=gr; ctx.fill();
+    dBTN(ctx,c.x,c.y,c.r,0);
+    if(Math.random()<0.18){
+      var ang=Math.random()*Math.PI*2;
+      pd.atp.push({x:c.x+Math.cos(ang)*c.r,y:c.y+Math.sin(ang)*c.r,vx:Math.cos(ang)*2.8,vy:Math.sin(ang)*2.8,life:1});
+    }
+  });
+  pd.glucose=pd.glucose.filter(function(g){
+    g.x+=g.vx; g.y+=g.vy; g.life-=0.013;
+    var abs=s.cells.some(function(c){return Math.hypot(g.x-c.x,g.y-c.y)<c.r+4;});
+    if(abs)return false;
+    ctx.beginPath(); ctx.arc(g.x,g.y,3.5,0,Math.PI*2);
+    ctx.fillStyle='rgba(245,200,66,'+(g.life*0.85)+')'; ctx.fill();
+    ctx.strokeStyle='rgba(180,140,0,'+(g.life*0.5)+')'; ctx.lineWidth=0.8; ctx.stroke();
+    return g.life>0;
+  });
+  pd.atp=pd.atp.filter(function(a){
+    a.x+=a.vx; a.y+=a.vy; a.life-=0.022;
+    ctx.beginPath(); ctx.arc(a.x,a.y,2.5,0,Math.PI*2);
+    ctx.fillStyle='rgba(152,255,152,'+(a.life*0.9)+')'; ctx.fill();
+    return a.life>0;
+  });
+  if(t>0.35){
+    var al=Math.min((t-0.35)*3,1); ctx.globalAlpha=al;
+    ctx.fillStyle='#412402'; ctx.font=Math.round(W*0.018)+'px -apple-system,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('glucose (amber) → absorbed → ATP (green) radiated out',W*0.5,H*0.79);
+    ctx.globalAlpha=1;
+  }
 }
 
 // ─── Init ────────────────────────────────────────────────────────────────────
@@ -514,7 +924,7 @@ OPENING = """
     <circle cx="60" cy="58" r="5" fill="#AFEEEE"/>
   </svg>
   <div style="text-align:center;z-index:1;padding:20px">
-    <div style="font-size:0.8em;font-weight:600;color:#5a8099;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px;opacity:0" class="open-sub">Master of Science Thesis · University of Rhode Island · 2025</div>
+    <div style="font-size:0.8em;font-weight:600;color:#5a8099;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:16px;opacity:0" class="open-sub">Master of Science Thesis · University of Rhode Island · 2026</div>
     <div class="open-title">Machine Learning as a Tool for Uncovering Transcriptional Signatures of Bivalve Transmissible Neoplasia in <em>Mercenaria mercenaria</em></div>
     <div style="opacity:0;margin-top:14px;font-size:1em;color:#2D2D2D" class="open-inst">Alberto A. Paz</div>
     <button class="begin-btn" onclick="beginPresentation()">Begin</button>
@@ -527,7 +937,7 @@ END_SCREEN = """
 <div id="end-screen">
   <div style="text-align:center;z-index:1">
     <div style="font-size:2.5em;font-weight:600;color:#2D2D2D;margin-bottom:12px">Thank you</div>
-    <div style="font-size:1em;color:#5a8099;margin-bottom:28px">University of Rhode Island · 2025</div>
+    <div style="font-size:1em;color:#5a8099;margin-bottom:28px">University of Rhode Island · 2026</div>
     <div style="display:flex;gap:16px;justify-content:center">
       <button class="end-btn" onclick="document.getElementById('end-screen').style.display='none';goTo(0)">Return to Start</button>
       <button class="end-btn" onclick="document.getElementById('end-screen').style.display='none';goTo(0)">View Again</button>
@@ -549,7 +959,7 @@ HTML = f"""<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Paz 2025 — BTN Thesis Defense</title>
+<title>Paz 2026 — BTN Thesis Defense</title>
 <style>{CSS}</style>
 </head>
 <body>
