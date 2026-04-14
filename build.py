@@ -263,11 +263,11 @@ slides.append(mkslide(6,f'''
 slides.append(mkslide(7,f'''
 <div style="display:grid;grid-template-columns:52% 1fr;gap:20px;padding:1% 4% 0;margin-top:0.5%">
   <div>
-    {figbox('i22','BTN Diagram','Normal hemocytes match host genotype; neoplastic BTN cells are clonal, foreign, and spread horizontally between animals.',0.3,'400px')}
+    {figbox('i22','BTN Diagram','Normal hemocytes match host genotype; neoplastic BTN cells are clonal, foreign, and spread horizontally between Hard Clams.',0.3,'400px')}
   </div>
   <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
     {acard('<div class="card-head">Leukemia-like condition</div><div class="card-body">Abnormal proliferation of hemocytes (immune blood cells); documented in mussels, clams, and cockles.</div>',0.45,AC['II'])}
-    {acard('<div class="card-head">Clonal parasitism</div><div class="card-body">BTN malignant cells act as clonal parasites, spreading <em>horizontally</em> between host animals.</div>',0.6,AC['II'])}
+    {acard('<div class="card-head">Clonal parasitism</div><div class="card-body">BTN malignant cells act as clonal parasites, spreading <em>horizontally</em> between host Hard Clams.</div>',0.6,AC['II'])}
     {acard('<div class="card-head">Broad reach</div><div class="card-body">At least <strong>8 independent BTN lineages</strong> documented across <strong>15 bivalve species</strong>; BTN cells survive up to <strong>19 days</strong> in seawater.</div>',0.75,AC['II'])}
   </div>
 </div>''',title='Bivalve Transmissible Cancer'))
@@ -337,7 +337,7 @@ slides.append(mkslide(11,f'''
     {acard('<div class="card-head">Current methods fall short</div><div class="card-body">Histological and cytological techniques are time-consuming, lack sensitivity and specificity, or are too expensive for routine use.</div>',0.55,AC['II'])}
     {acard('<div class="card-head">Not transferable to quahogs</div><div class="card-body">Molecular diagnostic tools developed for BTN in other bivalve species are not transferable to <em>M. mercenaria</em> (Santamarina et al., 2024).</div>',0.75,AC['II'])}
   </div>
-</div>''',title='The Detection Gap'))
+</div>''',title='No Tool Exists to Detect BTN Before Symptoms Appear'))
 
 # SLIDE 12 – Research Question
 slides.append(mkslide(12,f'''
@@ -397,7 +397,7 @@ slides.append(mkslide(14,f'''
 <div class="layout-d" style="gap:14px">
   <div style="font-size:2.2em;font-weight:600;color:#2D2D2D" data-animate="stat-reveal" data-delay="0.25">Experimental Design</div>
   <div style="width:50px;height:2px;background:{AC["III"]};margin:4px auto" data-animate="text-emerge" data-delay="0.45"></div>
-  <div style="font-size:1em;color:#5a8099;max-width:55%;line-height:1.6" data-animate="text-emerge" data-delay="0.55">To detect neoplasia, we need samples from animals confirmed to be infected — and from animals confirmed to be normal.</div>
+  <div style="font-size:1em;color:#5a8099;max-width:55%;line-height:1.6" data-animate="text-emerge" data-delay="0.55">To detect neoplasia, we need samples from Hard Clams confirmed to be infected — and from Hard Clams confirmed to be normal.</div>
 </div>'''))
 
 # SLIDE 15 – 1st Round
@@ -711,7 +711,7 @@ slides.append(mkslide(28,f'''
     {stcard('0.986','Balanced accuracy — equal performance across both classes',0.65)}
     {acard('<div class="card-head">18,491 hemocytes</div><div class="card-body">Evaluated on a held-out 30% test split of confirmed neoplastic and normal cells; 5,000 highly variable genes; linear SVM kernel.</div>',0.8,AC['IV'])}
   </div>
-</div>''',title='Gold Standard Model — 70/30 Split, 5,000 HVG'))
+</div>''',title='Gold Standard Model Achieves AUC = 0.9985'))
 
 # SLIDE 27 – Feature Coefficients
 _s29_card = acard('<div class="card-head">What the model gives us next</div><div class="card-body">A linear SVM weight vector assigns a coefficient to <em>every gene</em>. Genes with the largest absolute coefficients are the strongest discriminators between neoplastic and normal states.</div>', 0.75, AC['IV'])
@@ -726,7 +726,7 @@ slides.append(mkslide(29,f'''
 </div>
 <div style="padding:0 4%;margin-top:6px">
   {_s29_card}
-</div>''',title='Gold Standard Model — Feature Importance'))
+</div>''',title='Feature Importance Reveals 406 Biomarker Candidates'))
 
 # SLIDE 28 – Bridge: Test Biological Relevance
 slides.append(mkslide(30,f'''
@@ -744,7 +744,7 @@ slides.append(mkslide(31,f'''
   <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
     {card('<div class="card-head">Feature importance defined</div><div class="card-body">Feature importance was extracted from linear SVM weight vectors for <em>each</em> of the three HVG configurations — measuring how much each gene contributes to classification.</div>',0.5)}
   </div>
-</div>''',title='Biomarker Discovery — The Robustness Filter'))
+</div>''',title='20 Core Genes Identified Across All Configurations'))
 
 # SLIDE 32 – Top 20 Gold-Standard Biomarkers
 _s32_c1 = acard('<div class="card-head">Selection logic</div><div class="card-body">The top 20 were ranked by absolute SVM weight across the gold-standard 70/30 model trained on HVG 5,000 features — the highest-performing configuration (AUC = 0.9985).</div>', 0.7, AC['IV'])
@@ -758,7 +758,7 @@ slides.append(mkslide(32,f'''
     {stcard('46','Genes appearing in all three HVG configurations — the robust candidate core',0.55)}
     {_s32_c1}
   </div>
-</div>''',title='Biomarker Candidates — Feature Importance Ranking'))
+</div>''',title='Top 20 Biomarkers Ranked by SVM Coefficient Magnitude'))
 
 # SLIDE 30 – BTN Cancer Hallmarks
 slides.append(mkslide(33,'''
@@ -795,7 +795,7 @@ slides.append(mkslide(35,f'''
     {_s35_c4}
     {_s35_c5}
   </div>
-</div>''',title='Logistic Regression and Complexity Analysis'))
+</div>''',title='Complexity Analysis Shows Only 7–10 Genes Are Needed'))
 
 # SLIDE 33 – Act IV Summary
 slides.append(mkslide(36,f'''
@@ -805,57 +805,128 @@ slides.append(mkslide(36,f'''
     {card('<div class="card-head">Functional annotation</div><div class="card-body">EggNOG-mapper linked top biomarkers to metabolic, immune, and cell-cycle pathways — providing biological interpretability beyond classification performance.</div>',0.45)}
   </div>
   <div style="background:rgba(152,255,152,0.08);border-left:3px solid {AC["IV"]};border-radius:0 10px 10px 0;padding:14px 18px;display:flex;align-items:center;gap:18px" data-animate="stat-reveal" data-delay="0.65">
-    <div style="font-size:2.2em;font-weight:600;color:#2D2D2D;white-space:nowrap;line-height:1">17 / 20</div>
+    <div style="font-size:2.2em;font-weight:600;color:#2D2D2D;white-space:nowrap;line-height:1">7–10</div>
     <div>
-      <div style="font-size:0.85em;font-weight:600;color:#2D2D2D">Annotated genes map onto known cancer hallmarks</div>
-      <div style="font-size:0.78em;color:#5a8099;margin-top:4px">Of the top 20 genes ranked by SVM coefficient magnitude — the model is recovering biologically coherent signals consistent with established cancer biology, not statistical noise.</div>
+      <div style="font-size:0.85em;font-weight:600;color:#2D2D2D">Genes are sufficient for near-perfect classification</div>
+      <div style="font-size:0.78em;color:#5a8099;margin-top:4px">Performance plateaus at just 7–10 top-ranked genes — the full signal is captured by a compact panel, suggesting a parsimonious diagnostic tool is within reach.</div>
     </div>
   </div>
-</div>''',title='Top 20 SVM Biomarkers and Cancer Hallmarks'))
+</div>''',title='Summary of Our Findings'))
 
-# SLIDE 34 – Bridge: Are These Genes Biologically Real?
+# SLIDE – Transition: ML + DE
 slides.append(mkslide(37,f'''
-<div class="layout-d" style="gap:18px">
-  <div style="font-size:0.9em;color:#5a8099;text-transform:uppercase;letter-spacing:0.12em;font-weight:600" data-animate="title-fade" data-delay="0.2">The next question</div>
-  <div style="font-size:1.75em;font-weight:600;color:#2D2D2D;max-width:62%;line-height:1.35;text-align:center" data-animate="stat-reveal" data-delay="0.4">We know <em>how many</em> genes are needed. But are the genes the model chose actually biologically meaningful?</div>
+<div class="layout-d" style="gap:16px">
+  <div style="font-size:1em;color:#5a8099;text-transform:uppercase;letter-spacing:0.12em;font-weight:600" data-animate="title-fade" data-delay="0.2">Before we go further</div>
+  <div style="font-size:1.8em;font-weight:600;color:#2D2D2D;max-width:62%;line-height:1.35;text-align:center" data-animate="stat-reveal" data-delay="0.4">The model ranks genes by how well they classify. Does classical biology <em>independently</em> agree?</div>
   <div style="width:48px;height:2px;background:{AC["IV"]};margin:0 auto" data-animate="text-emerge" data-delay="0.65"></div>
-  <div style="font-size:1em;color:#5a8099;max-width:56%;text-align:center;line-height:1.7" data-animate="text-emerge" data-delay="0.8">To test this, we compared the ML feature importance rankings against an independent differential expression analysis — two completely separate methods asking the same biological question.</div>
+  <div style="font-size:0.95em;color:#5a8099;max-width:52%;text-align:center;line-height:1.7" data-animate="text-emerge" data-delay="0.8">We run differential expression separately — no shared inputs, no knowledge of what the model ranked — and ask whether the same genes rise to the top.</div>
 </div>'''))
 
-# SLIDE 35 – ML–DE Convergence (merged 40+41)
+# SLIDE 34 – Bridge: Are These Genes Biologically Real?
 slides.append(mkslide(38,f'''
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:1% 4% 0;margin-top:0.5%">
+
+  <!-- Gene A -->
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="text-align:center;font-size:0.78em;font-weight:600;color:#2D2D2D" data-animate="title-fade" data-delay="0.25">Gene A — Low Expression</div>
+    <div style="background:#fff;border:1px solid rgba(175,238,238,0.4);border-radius:10px;padding:12px 16px" data-animate="scale-fade-in" data-delay="0.35">
+      <svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+        <line x1="28" y1="8" x2="28" y2="90" stroke="#AFEEEE" stroke-width="1"/>
+        <line x1="28" y1="90" x2="195" y2="90" stroke="#AFEEEE" stroke-width="1"/>
+        <line x1="28" y1="65" x2="195" y2="65" stroke="#AFEEEE" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <line x1="28" y1="40" x2="195" y2="40" stroke="#AFEEEE" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <line x1="28" y1="15" x2="195" y2="15" stroke="#AFEEEE" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <text x="18" y="60" font-size="7" fill="#5a8099" text-anchor="middle" transform="rotate(-90,18,60)" font-family="-apple-system,sans-serif">Expression</text>
+        <!-- Normal bar: very low -->
+        <rect x="50" y="78" width="42" height="12" rx="3" fill="#AFEEEE"/>
+        <text x="71" y="103" font-size="8.5" fill="#185FA5" text-anchor="middle" font-weight="600" font-family="-apple-system,sans-serif">Normal</text>
+        <!-- Neoplastic bar: slightly higher but still low -->
+        <rect x="108" y="72" width="42" height="18" rx="3" fill="#E6E6FA"/>
+        <text x="129" y="103" font-size="8.5" fill="#3C3489" text-anchor="middle" font-weight="600" font-family="-apple-system,sans-serif">Neoplastic</text>
+        <!-- subtle difference bracket -->
+        <line x1="71" y1="76" x2="129" y2="70" stroke="#E05555" stroke-width="1" stroke-dasharray="3,2" opacity="0.7"/>
+      </svg>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap" data-animate="text-emerge" data-delay="0.5">
+      <span style="background:rgba(224,85,85,0.1);border:1px solid rgba(224,85,85,0.3);border-radius:20px;padding:3px 10px;font-size:0.65em;font-weight:600;color:#791F1F">DE may miss this</span>
+      <span style="background:rgba(152,255,152,0.15);border:1px solid rgba(152,255,152,0.4);border-radius:20px;padding:3px 10px;font-size:0.65em;font-weight:600;color:#27500A">ML still finds it</span>
+    </div>
+  </div>
+
+  <!-- Gene B -->
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <div style="text-align:center;font-size:0.78em;font-weight:600;color:#2D2D2D" data-animate="title-fade" data-delay="0.4">Gene B — High Expression</div>
+    <div style="background:#fff;border:1px solid rgba(175,238,238,0.4);border-radius:10px;padding:12px 16px" data-animate="scale-fade-in" data-delay="0.5">
+      <svg viewBox="0 0 200 110" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+        <line x1="28" y1="8" x2="28" y2="90" stroke="#AFEEEE" stroke-width="1"/>
+        <line x1="28" y1="90" x2="195" y2="90" stroke="#AFEEEE" stroke-width="1"/>
+        <line x1="28" y1="65" x2="195" y2="65" stroke="#AFEEEE" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <line x1="28" y1="40" x2="195" y2="40" stroke="#AFEEEE" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <line x1="28" y1="15" x2="195" y2="15" stroke="#AFEEEE" stroke-width="0.5" stroke-dasharray="3,3"/>
+        <text x="18" y="60" font-size="7" fill="#5a8099" text-anchor="middle" transform="rotate(-90,18,60)" font-family="-apple-system,sans-serif">Expression</text>
+        <!-- Normal bar: moderate -->
+        <rect x="50" y="52" width="42" height="38" rx="3" fill="#AFEEEE"/>
+        <text x="71" y="103" font-size="8.5" fill="#185FA5" text-anchor="middle" font-weight="600" font-family="-apple-system,sans-serif">Normal</text>
+        <!-- Neoplastic bar: much higher -->
+        <rect x="108" y="14" width="42" height="76" rx="3" fill="#E6E6FA"/>
+        <text x="129" y="103" font-size="8.5" fill="#3C3489" text-anchor="middle" font-weight="600" font-family="-apple-system,sans-serif">Neoplastic</text>
+        <!-- bold fold-change arrow -->
+        <line x1="71" y1="50" x2="129" y2="18" stroke="#27500A" stroke-width="1.8"/>
+        <polygon points="129,14 124,23 134,21" fill="#27500A"/>
+      </svg>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap" data-animate="text-emerge" data-delay="0.65">
+      <span style="background:rgba(152,255,152,0.15);border:1px solid rgba(152,255,152,0.4);border-radius:20px;padding:3px 10px;font-size:0.65em;font-weight:600;color:#27500A">DE detects this clearly</span>
+      <span style="background:rgba(152,255,152,0.15);border:1px solid rgba(152,255,152,0.4);border-radius:20px;padding:3px 10px;font-size:0.65em;font-weight:600;color:#27500A">ML detects this too</span>
+    </div>
+  </div>
+
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 4%;margin-top:10px">
+  {card('<div class="card-head">DE — Robust &amp; Traditional</div><div class="card-body">Measures fold-change between groups. Proven method — but needs high absolute expression to reach statistical significance. Gene B is exactly what it was built for.</div>',0.75)}
+  {card('<div class="card-head">ML — Finds What DE Leaves Out</div><div class="card-body">Ranks genes by how well they separate cells, regardless of expression level. Surfaces subtle but consistent signals like Gene A that DE would discard as noise.</div>',0.9)}
+</div>''',title='Why We Combine ML and Differential Expression'))
+
+# SLIDE 35 – ML–DE Convergence (merged 40+41)
+_s39_c1 = acard('<div class="card-head">Linear SVM</div><div class="card-body">Identified the top genes driving neoplastic vs. normal cell separation by classification power.</div>', 0.4, AC['IV'])
+_s39_c2 = acard('<div class="card-head">Differential Expression</div><div class="card-body">Tested whether those same genes showed systematic expression differences between the two groups.</div>', 0.55, AC['IV'])
+_s39_c3 = acard('<div class="card-head">18 of 20 genes overlap</div><div class="card-body">Biomarkers that are both predictive by ML <em>and</em> biologically supported by DE — not modeling artifacts.</div>', 0.7, AC['IV'])
+_s39_c4 = acard('<div class="card-head">A note on the remaining 2</div><div class="card-body">The 2 non-overlapping genes are linked to mitochondrial and metabolic programs — they may also reflect technical or stress-related signals rather than neoplasia-specific biology.</div>', 0.85, AC['V'])
+slides.append(mkslide(39,f'''
 <div style="display:grid;grid-template-columns:55% 1fr;gap:18px;padding:1% 4% 0;margin-top:0.5%">
   <div>
-    {figbox('i12','ML vs. DE Convergence','Absolute SVM coefficient vs. log₂ fold-change (Neoplastic/Normal). Red = Top 20 gold-standard; Blue = in all 3 configs; Gray = other candidates.',0.3,'430px')}
+    {figbox('i12','ML vs. DE Convergence','Absolute SVM coefficient vs. log₂ fold-change (Neoplastic/Normal). Red = Top 20 gold-standard; Blue = in all 3 configs; Gray = other candidates.',0.3,'390px')}
   </div>
-  <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
-    <div style="font-size:0.7em;font-weight:600;color:#5a8099;letter-spacing:0.06em;text-transform:uppercase" data-animate="text-emerge" data-delay="0.35">Concordance confirmed</div>
-    {stcard('18 / 20','Top ML biomarkers also differentially expressed between neoplastic and normal pools',0.5)}
-    {acard('<div class="card-head">How this was done</div><div class="card-body">SVM coefficient magnitudes from the gold-standard model were ranked to identify the top 20 ML features. Separately, a differential expression analysis compared neoplastic vs. normal pools using log₂ fold-change. The two ranked lists were then overlaid.</div>',0.7,AC['IV'])}
-    {acard('<div class="card-head">What this means</div><div class="card-body">When two completely independent methods converge on the same genes, it is strong evidence those genes reflect real biology — not modeling artifacts.</div>',0.9,AC['IV'])}
+  <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+    {_s39_c1}
+    {_s39_c2}
+    {_s39_c3}
+    {_s39_c4}
   </div>
-</div>''',title='Convergence of ML Feature Importance and Differential Expression'))
+</div>''',title='18 of 20 Top Genes Confirmed by Differential Expression'))
 
 # SLIDE 35 – Overall Summary
-slides.append(mkslide(39,f'''
-<div class="layout-d" style="gap:16px">
-  <div style="font-size:1.8em;font-weight:600;color:#2D2D2D;max-width:60%;line-height:1.3" data-animate="stat-reveal" data-delay="0.3">A high-performing SVM classifier and a validated biomarker list.</div>
-  <div style="font-size:1em;color:#5a8099;max-width:55%;line-height:1.6" data-animate="text-emerge" data-delay="0.6">Now: can this model detect BTN-like transcriptomics in animals that were <em>never used in training</em>?</div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px" data-animate="text-emerge" data-delay="0.8">
-    {pill('AUC = 0.9985','mint')} {pill('406 biomarker candidates','blue')}
+slides.append(mkslide(40,f'''
+<div class="layout-d" style="gap:14px">
+  <div style="font-size:0.9em;color:#5a8099;text-transform:uppercase;letter-spacing:0.12em;font-weight:600" data-animate="title-fade" data-delay="0.15">Why this matters</div>
+  <div style="font-size:1.55em;font-weight:600;color:#2D2D2D;max-width:65%;line-height:1.35;text-align:center" data-animate="stat-reveal" data-delay="0.35">Two independent methods — ML and DE — converge on the same genes. That convergence helps validate our model, and ML also surfaces signatures DE leaves behind due to insufficient expression.</div>
+  <div style="width:48px;height:2px;background:{AC["IV"]};margin:0 auto" data-animate="text-emerge" data-delay="0.6"></div>
+  <div style="font-size:0.95em;color:#5a8099;max-width:54%;text-align:center;line-height:1.7" data-animate="text-emerge" data-delay="0.75">Now we take this validated classifier and apply it to Hard Clams that were <em>never used in training</em> — to ask whether it can detect neoplastic signal before any symptoms appear.</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center" data-animate="text-emerge" data-delay="0.9">
+    {pill('AUC = 0.9985','mint')} {pill('18 / 20 genes validated','blue')} {pill('applied to unseen Hard Clams','lavender')}
   </div>
 </div>'''))
 
 # SLIDE 36 – Contextual Reminder
-slides.append(mkslide(40,f'''
+slides.append(mkslide(41,f'''
 <div class="layout-d" style="gap:16px">
   <div style="font-size:0.9em;color:#5a8099;text-transform:uppercase;letter-spacing:0.12em;font-weight:600" data-animate="text-emerge" data-delay="0.2">Critical context</div>
   <div style="font-size:1.7em;font-weight:600;color:{AC["V"]};max-width:65%;line-height:1.3" data-animate="stat-reveal" data-delay="0.45">Our model was NOT trained on 5-day or 12-day samples.</div>
-  <div style="font-size:1em;color:#5a8099;max-width:55%;line-height:1.6" data-animate="text-emerge" data-delay="0.75">These animals were exposed but showed no histological signs of neoplasia at time of sampling. We are applying a trained classifier to entirely novel data.</div>
+  <div style="font-size:1em;color:#5a8099;max-width:55%;line-height:1.6" data-animate="text-emerge" data-delay="0.75">These Hard Clams were exposed but showed no histological signs of neoplasia at time of sampling. We are applying a trained classifier to entirely novel data.</div>
 </div>'''))
 
 # SLIDE 37 – Pre-Symptomatic Methodology
-slides.append(mkslide(41,f'''
+slides.append(mkslide(42,f'''
 <div style="display:flex;flex-direction:column;gap:14px;padding:1% 5% 0;margin-top:1%">
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
     {acard('<div class="card-head">The goal</div><div class="card-body">Detect neoplastic-like transcriptomics at early timepoints where conventional histology <em>cannot</em> yet detect disease — presymptomatic classification.</div>',0.4,AC['V'])}
@@ -888,10 +959,10 @@ slides.append(mkslide(41,f'''
     <text x="540" y="36" text-anchor="middle" font-size="9" fill="#791F1F" font-family="-apple-system,sans-serif">Histology detects</text>
     <text x="540" y="92" text-anchor="middle" font-size="8.5" fill="#5a8099" font-family="-apple-system,sans-serif">Visible neoplasia confirmed</text>
   </svg>
-</div>''',title='Pre-Symptomatic Detection at 5 and 12 Days'))
+</div>''',title='ML Detects Neoplastic Signal Before Symptoms Appear'))
 
 # SLIDE 38 – Pre-Symptomatic Results (merged 45+46)
-slides.append(mkslide(42,f'''
+slides.append(mkslide(43,f'''
 <div style="display:grid;grid-template-columns:55% 1fr;gap:18px;padding:1% 4% 0;margin-top:0.5%">
   <div>
     {figbox('i8','Probability Distribution','Neoplastic probability scores for all four conditions. Dashed line = 0.5 classification threshold.',0.3,'370px')}
@@ -901,26 +972,26 @@ slides.append(mkslide(42,f'''
     {stcard('6%','Of 12-day post-exposure cells predicted neoplastic — later presymptomatic timepoint',0.65)}
     {acard('<div class="card-head">Presymptomatic signal detected</div><div class="card-body">The model was never trained on 5-day or 12-day samples. These transcriptional signatures emerge spontaneously from the trained classifier — confirming early biological change.</div>',0.8,AC['V'])}
   </div>
-</div>''',title='Pre-Symptomatic Detection — Results'))
+</div>''',title='Neoplastic Probability Elevated Before Any Histological Signs'))
 
 # SLIDE 39 – Bridge: Pre-Symptomatic → Genotyping
-slides.append(mkslide(43,f'''
+slides.append(mkslide(44,f'''
 <div class="layout-d" style="gap:18px">
   <div style="font-size:0.9em;font-weight:600;color:{AC["V"]};letter-spacing:0.08em;text-transform:uppercase" data-animate="title-fade" data-delay="0.2">What we just saw</div>
-  <div style="font-size:1.5em;font-weight:600;color:#2D2D2D;max-width:68%;line-height:1.35;text-align:center" data-animate="stat-reveal" data-delay="0.4">The classifier detected presymptomatic neoplastic signal in unexposed animals — before any histological signs appeared.</div>
+  <div style="font-size:1.5em;font-weight:600;color:#2D2D2D;max-width:68%;line-height:1.35;text-align:center" data-animate="stat-reveal" data-delay="0.4">The classifier detected presymptomatic neoplastic signal in unexposed Hard Clams — before any histological signs appeared.</div>
   <div style="width:48px;height:2px;background:{AC["V"]};margin:0 auto" data-animate="text-emerge" data-delay="0.65"></div>
   <div style="font-size:0.95em;color:#5a8099;max-width:60%;text-align:center;line-height:1.7" data-animate="text-emerge" data-delay="0.8">Next — can host genotyping independently confirm what the model found?</div>
 </div>'''))
 
 # SLIDE 40 – Genotyping Introduction (merged 47+48)
-slides.append(mkslide(44,f'''
+slides.append(mkslide(45,f'''
 <div style="display:flex;flex-direction:column;gap:14px;padding:1% 5% 0;margin-top:0.5%">
-  {acard('<div class="card-head">What is genotyping?</div><div class="card-body">Using single-nucleotide polymorphisms (SNPs) expressed in the transcriptome, we can assign each cell to a host individual. In a pool of four animals, we expect four distinct genotypes.</div>',0.3,AC['V'])}
+  {acard('<div class="card-head">What is genotyping?</div><div class="card-body">Using single-nucleotide polymorphisms (SNPs) expressed in the transcriptome, we can assign each cell to a host individual. In a pool of four Hard Clams, we expect four distinct genotypes.</div>',0.3,AC['V'])}
   {card('<div class="card-head">The question</div><div class="card-body">Does a foreign genotype appear in the neoplastic pool — and do those cells agree with what the ML classifier labeled as neoplastic?</div>',0.6)}
 </div>''',title='Genotyping — An Independent Validation'))
 
 # SLIDE 40 – Genotyping PCA (merged 49+50)
-slides.append(mkslide(45,f'''
+slides.append(mkslide(46,f'''
 <div style="display:grid;grid-template-rows:1fr auto;padding:1% 5% 0;gap:8px;height:100%">
   <div class="fig-frame" style="flex:1;min-height:0;position:relative" data-animate="scale-fade-in" data-delay="0.3">
     <div class="fig-lbl">Genotype-Level PCA</div>
@@ -933,7 +1004,7 @@ slides.append(mkslide(45,f'''
 </div>''',title='A Fifth Genotype Emerges'))
 
 # SLIDE 41 – Bridge: Genotype Validation Question
-slides.append(mkslide(46,f'''
+slides.append(mkslide(47,f'''
 <div class="layout-d" style="gap:20px">
   <div style="font-size:1.05em;font-weight:600;color:{AC["V"]};letter-spacing:0.06em;text-transform:uppercase" data-animate="title-fade" data-delay="0.25">One lineage identified</div>
   <div style="font-size:1.7em;font-weight:600;color:#2D2D2D;max-width:65%;line-height:1.35;text-align:center" data-animate="stat-reveal" data-delay="0.4">A single transmissible BTN lineage appears to underlie the neoplastic pool.</div>
@@ -942,7 +1013,7 @@ slides.append(mkslide(46,f'''
 </div>'''))
 
 # SLIDE 42 – Concordance (merged 51+52)
-slides.append(mkslide(47,f'''
+slides.append(mkslide(48,f'''
 <div style="display:grid;grid-template-columns:58% 1fr;gap:18px;padding:1% 4% 0;margin-top:0.5%">
   <div>
     {figbox('i20','Classifier Agreement','Per-Genotype ML Classification (28 Genotypes) — % cells classified as neoplastic by SVM, grouped by pool type.',0.3,'430px')}
@@ -953,10 +1024,10 @@ slides.append(mkslide(47,f'''
     {stcard('97.3%','Mean neoplastic SVM classification across 10 neoplastic genotypes',0.65)}
     {acard('<div class="card-head">1.9% normal misclassification</div><div class="card-body">Only 1.9% of cells in 8 normal genotype clusters were misclassified as neoplastic — confirming near-perfect specificity.</div>',0.8,AC['V'])}
   </div>
-</div>''',title='Classifier and Genotype Concordance'))
+</div>''',title='Genotyping Independently Confirms the ML Classifier — 98.7% Agreement'))
 
 # SLIDE 43 – Summary of Key Findings
-slides.append(mkslide(48,f'''
+slides.append(mkslide(49,f'''
 <div style="display:flex;flex-direction:column;gap:12px;padding:1% 5% 0;margin-top:0.5%">
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
     {stcard('0.9985','AUC — near-perfect separation of neoplastic from normal hemocytes on held-out test data',0.3)}
@@ -965,12 +1036,12 @@ slides.append(mkslide(48,f'''
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
     {acard('<div class="card-head">Biological validation</div><div class="card-body"><strong>18 of 20</strong> top ML biomarkers are also differentially expressed — two independent analytical lenses converging on the same biological signal.</div>',0.6,AC['VI'])}
-    {acard('<div class="card-head">Presymptomatic detection</div><div class="card-body"><strong>21.3%</strong> of 5-day post-exposure cells crossed the neoplastic probability threshold — a 21-fold increase over the normal baseline. Model never trained on these samples.</div>',0.7,AC['VI'])}
+    {acard('<div class="card-head">Presymptomatic detection</div><div class="card-body"><strong>7%</strong> of 5-day and <strong>6%</strong> of 12-day post-exposure cells predicted neoplastic — before any histological signs of disease. Model never trained on these Hard Clams.</div>',0.7,AC['VI'])}
     {acard('<div class="card-head">Genotyping confirmation</div><div class="card-body">Host genotyping independently confirmed neoplastic signal — cells flagged by the ML model showed genetic evidence consistent with transmissible neoplasia, validating the classifier through an entirely separate biological approach.</div>',0.8,AC['VI'])}
   </div>
   <div style="padding:0" data-animate="text-emerge" data-delay="0.95">
     <div style="background:rgba(152,255,152,0.1);border-left:3px solid #98FF98;border-radius:0 8px 8px 0;padding:8px 14px;font-size:0.82em;color:#2D2D2D;line-height:1.5">
-      <strong>Bottom line:</strong> A parsimonious panel of fewer than 10 genes — identified by machine learning and confirmed by genotyping — is sufficient for near-perfect BTN classification with presymptomatic detection capability.
+      <strong>Bottom line:</strong> Our logistic regression panel shows that fewer than 10 genes are needed — suggesting a compact, validated gene set may be sufficient for BTN classification.
     </div>
   </div>
 </div>''',title='Summary of Key Findings'))
@@ -979,24 +1050,104 @@ slides.append(mkslide(48,f'''
 _s49_c1 = acard('<div class="card-head">Many genes remain unannotated</div><div class="card-body">A significant portion of top biomarkers could not be functionally characterized due to gaps in the <em>M. mercenaria</em> reference genome — limiting our ability to fully interpret the biological meaning of every signal the model identified.</div>', 0.4, AC['V'])
 _s49_c2 = acard('<div class="card-head">Unequal genotype representation</div><div class="card-body">Certain genotypes contributed disproportionately more cells to the dataset — meaning some individual clams may be over-represented in the training signal, potentially biasing the model toward those animals\' transcriptional profiles.</div>', 0.6, AC['V'])
 _s49_c3 = acard('<div class="card-head">Unannotated genes as untapped signal</div><div class="card-body">Testing on currently unannotated genes may uncover stronger biomarkers and key drivers of neoplasia that are invisible to the current analysis — the most important genes may still be hidden in the dark genome.</div>', 0.8, AC['V'])
-slides.append(mkslide(49,f'''
+slides.append(mkslide(50,f'''
 <div style="display:flex;flex-direction:column;gap:16px;padding:1% 5% 0;margin-top:1%">
   {_s49_c1}
   {_s49_c2}
   {_s49_c3}
 </div>''',title='Limitations'))
 
+# SLIDE – Real World Applications
+slides.append(mkslide(51,f'''
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:1% 4% 0;margin-top:0.5%">
+
+  <!-- Left: SVG pipeline illustration -->
+  <div data-animate="scale-fade-in" data-delay="0.3">
+    <svg viewBox="0 0 320 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;border:1px solid rgba(175,238,238,0.35);border-radius:10px;background:#fafeff">
+
+      <!-- Title -->
+      <text x="160" y="22" text-anchor="middle" font-size="10" font-weight="600" fill="#2D2D2D" font-family="-apple-system,sans-serif">From Lab Discovery → Real-World Tool</text>
+
+      <!-- Step 1: Tank / Clams -->
+      <rect x="20" y="38" width="80" height="52" rx="8" fill="rgba(175,238,238,0.2)" stroke="#AFEEEE" stroke-width="1.2"/>
+      <text x="60" y="68" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2D2D2D" font-family="-apple-system,sans-serif">Hard Clam</text>
+      <text x="60" y="82" text-anchor="middle" font-size="7.5" fill="#5a8099" font-family="-apple-system,sans-serif">Hatchery / Farm</text>
+
+      <!-- Arrow 1 -->
+      <line x1="100" y1="64" x2="118" y2="64" stroke="#AFEEEE" stroke-width="1.5"/>
+      <polygon points="118,60 126,64 118,68" fill="#AFEEEE"/>
+
+      <!-- Step 2: Blood sample -->
+      <rect x="126" y="38" width="68" height="52" rx="8" fill="rgba(175,238,238,0.2)" stroke="#AFEEEE" stroke-width="1.2"/>
+      <text x="160" y="68" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2D2D2D" font-family="-apple-system,sans-serif">Hemocyte</text>
+      <text x="160" y="82" text-anchor="middle" font-size="7.5" fill="#5a8099" font-family="-apple-system,sans-serif">Sample</text>
+
+      <!-- Arrow 2 -->
+      <line x1="194" y1="64" x2="212" y2="64" stroke="#AFEEEE" stroke-width="1.5"/>
+      <polygon points="212,60 220,64 212,68" fill="#AFEEEE"/>
+
+      <!-- Step 3: Gene test -->
+      <rect x="220" y="38" width="80" height="52" rx="8" fill="rgba(175,238,238,0.2)" stroke="#AFEEEE" stroke-width="1.2"/>
+      <text x="260" y="68" text-anchor="middle" font-size="8.5" font-weight="600" fill="#2D2D2D" font-family="-apple-system,sans-serif">7–10 Gene</text>
+      <text x="260" y="82" text-anchor="middle" font-size="7.5" fill="#5a8099" font-family="-apple-system,sans-serif">RT-qPCR Panel</text>
+
+      <!-- Divider -->
+      <line x1="20" y1="106" x2="300" y2="106" stroke="#AFEEEE" stroke-width="0.8" stroke-dasharray="4,3"/>
+
+      <!-- Result: Healthy -->
+      <rect x="20" y="118" width="124" height="60" rx="8" fill="rgba(152,255,152,0.12)" stroke="#98FF98" stroke-width="1.2"/>
+      <text x="82" y="143" text-anchor="middle" font-size="8.5" font-weight="600" fill="#27500A" font-family="-apple-system,sans-serif">No signal detected</text>
+      <text x="82" y="158" text-anchor="middle" font-size="7.5" fill="#5a8099" font-family="-apple-system,sans-serif">Clam likely healthy</text>
+
+      <!-- Result: Warning -->
+      <rect x="176" y="118" width="124" height="60" rx="8" fill="rgba(224,85,85,0.08)" stroke="#E05555" stroke-width="1.2"/>
+      <text x="238" y="143" text-anchor="middle" font-size="8.5" font-weight="600" fill="#791F1F" font-family="-apple-system,sans-serif">BTN signal present</text>
+      <text x="238" y="158" text-anchor="middle" font-size="7.5" fill="#5a8099" font-family="-apple-system,sans-serif">Early intervention possible</text>
+
+      <!-- Arrows down to results -->
+      <line x1="160" y1="90" x2="82" y2="118" stroke="#98FF98" stroke-width="1.2"/>
+      <line x1="160" y1="90" x2="238" y2="118" stroke="#E05555" stroke-width="1.2"/>
+
+      <!-- Bottom note -->
+      <rect x="20" y="196" width="280" height="36" rx="6" fill="rgba(152,255,152,0.08)" stroke="rgba(152,255,152,0.3)" stroke-width="1"/>
+      <text x="160" y="210" text-anchor="middle" font-size="8" font-weight="600" fill="#2D2D2D" font-family="-apple-system,sans-serif">No single-cell sequencing needed for deployment</text>
+      <text x="160" y="223" text-anchor="middle" font-size="7.5" fill="#5a8099" font-family="-apple-system,sans-serif">Discovery was scRNA-seq · Deployment can be RT-qPCR</text>
+
+      <!-- Bottom species note -->
+      <text x="160" y="258" text-anchor="middle" font-size="7.5" fill="#5a8099" font-family="-apple-system,sans-serif">Framework extends to oysters, mussels &amp; 15+ bivalve species</text>
+      <text x="160" y="270" text-anchor="middle" font-size="7.5" fill="#5a8099" font-family="-apple-system,sans-serif">with 8+ independent BTN lineages identified globally</text>
+    </svg>
+  </div>
+
+  <!-- Right: 3 friendly cards -->
+  <div style="display:flex;flex-direction:column;gap:12px;justify-content:center">
+    <div style="background:rgba(152,255,152,0.08);border-left:3px solid #98FF98;border-radius:0 10px 10px 0;padding:12px 16px" data-animate="text-emerge" data-delay="0.45">
+      <div style="font-size:0.82em;font-weight:600;color:#2D2D2D;margin-bottom:4px">For the Farmer</div>
+      <div style="font-size:0.75em;color:#5a8099;line-height:1.6">BTN causes <strong>80–90% mortality</strong> and costs Rhode Island <strong>$4M/year</strong>. A simple gene test could catch it <em>before</em> it spreads through a tank — giving farmers a chance to act.</div>
+    </div>
+    <div style="background:rgba(175,238,238,0.1);border-left:3px solid #AFEEEE;border-radius:0 10px 10px 0;padding:12px 16px" data-animate="text-emerge" data-delay="0.6">
+      <div style="font-size:0.82em;font-weight:600;color:#2D2D2D;margin-bottom:4px">For the Diagnostic Lab</div>
+      <div style="font-size:0.75em;color:#5a8099;line-height:1.6">The biomarkers we found with cutting-edge single-cell tech can be repackaged into a <strong>cheap, fast RT-qPCR assay</strong> — no expensive equipment, accessible anywhere.</div>
+    </div>
+    <div style="background:rgba(230,230,250,0.15);border-left:3px solid #E6E6FA;border-radius:0 10px 10px 0;padding:12px 16px" data-animate="text-emerge" data-delay="0.75">
+      <div style="font-size:0.82em;font-weight:600;color:#2D2D2D;margin-bottom:4px">Beyond Hard Clams</div>
+      <div style="font-size:0.75em;color:#5a8099;line-height:1.6">The same ML pipeline works for any bivalve with labeled data. Oysters, mussels, scallops — this framework is a blueprint for bivalve cancer detection across species.</div>
+    </div>
+  </div>
+
+</div>''',title='Real World Applications'))
+
 # SLIDE – Future Directions
 _s50_c1 = acard('<div class="card-head">Expand to wild populations and field validation</div><div class="card-body">The biomarker panel needs to be tested against wild <em>M. mercenaria</em> populations across seasons and geographic locations — the critical step between laboratory proof-of-concept and a deployable early-warning diagnostic tool for hatcheries and fisheries managers.</div>', 0.4, AC['VI'])
 _s50_c2 = acard('<div class="card-head">Investigate unannotated genes as untapped signal</div><div class="card-body">A substantial portion of the top-ranked features remain functionally uncharacterized. As the <em>M. mercenaria</em> reference genome improves, re-analysis of these genes may reveal stronger biomarkers and expose molecular drivers of neoplasia that are currently invisible to the model.</div>', 0.65, AC['VI'])
-slides.append(mkslide(50,f'''
+slides.append(mkslide(52,f'''
 <div style="display:flex;flex-direction:column;gap:16px;padding:1% 5% 0;margin-top:1%">
   {_s50_c1}
   {_s50_c2}
 </div>''',title='Future Directions'))
 
 # SLIDE 46 – Acknowledgments / Thank You
-slides.append(mkslide(51,f'''
+slides.append(mkslide(53,f'''
 <div style="display:flex;flex-direction:column;gap:14px;padding:1% 5% 0;margin-top:0.5%">
   <div style="text-align:center;font-size:1.8em;font-weight:600;color:#2D2D2D" data-animate="stat-reveal" data-delay="0.2">Thank You</div>
   <div style="width:50px;height:2px;background:#98FF98;margin:0 auto" data-animate="text-emerge" data-delay="0.35"></div>

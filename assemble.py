@@ -484,6 +484,234 @@ function startSVM() {
   }, 80);
 }
 
+// ─── ML vs DE Animation ──────────────────────────────────────────────────────
+var mldeRAF = null, mldeT0 = null;
+const MLDE_LOOP = 11000;
+
+// Gene names and rankings
+const MLDE_GENES = ['ALDH1A3','CAT-L','HSP90α','PCNA','CDK2','MMP-9','BCL2','RAC1'];
+// ML ranks genes 0-7 by SVM coefficient (0 = highest)
+const ML_ORDER  = [0,1,2,3,4,5,6,7];
+// DE ranks same genes differently by fold-change
+const DE_ORDER  = [1,0,3,2,4,6,5,7];
+// Genes in both top 5 lists (indices into MLDE_GENES)
+const SHARED    = new Set([0,1,2,3,4]);
+
+function stopMLDE() {
+  if (mldeRAF) { cancelAnimationFrame(mldeRAF); mldeRAF = null; }
+  mldeT0 = null;
+}
+
+function startMLDE() {
+  stopMLDE();
+  const canvas = document.getElementById('mlde-canvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = canvas.offsetWidth  * dpr;
+  canvas.height = canvas.offsetHeight * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  mldeT0 = null;
+  function loop(ts) {
+    if (!mldeT0) mldeT0 = ts;
+    const t = (ts - mldeT0) % MLDE_LOOP;
+    drawMLDE(ctx, canvas.offsetWidth, canvas.offsetHeight, t);
+    mldeRAF = requestAnimationFrame(loop);
+  }
+  mldeRAF = requestAnimationFrame(loop);
+}
+
+function ease(x) { return x < 0.5 ? 2*x*x : 1-Math.pow(-2*x+2,2)/2; }
+function fadeIn(t, start, dur) { return Math.min(1, Math.max(0, ease((t-start)/dur))); }
+
+function drawMLDE(ctx, W, H, t) {
+  ctx.clearRect(0, 0, W, H);
+  const f = W / 1100; // scale factor
+
+  const mlA  = fadeIn(t, 0,    800);   // ML panel fades in
+  const deA  = fadeIn(t, 2500, 800);   // DE panel fades in
+  const conA = fadeIn(t, 5200, 900);   // Convergence lines
+  const badA = fadeIn(t, 6500, 700);   // Badge pop-in
+
+  const lX = W*0.04, lW = W*0.38;  // left panel bounds
+  const rX = W*0.58, rW = W*0.38;  // right panel bounds
+  const cX = W*0.42, cW = W*0.16;  // centre bounds
+  const barTop = H*0.52, barH = H*0.055, barGap = H*0.072;
+
+  // ── Background panels ──
+  function panel(x, w, col, a) {
+    ctx.save(); ctx.globalAlpha = a * 0.06;
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.roundRect(x, H*0.04, w, H*0.9, 10*f); ctx.fill();
+    ctx.restore();
+    ctx.save(); ctx.globalAlpha = a * 0.25;
+    ctx.strokeStyle = col; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(x, H*0.04, w, H*0.9, 10*f); ctx.stroke();
+    ctx.restore();
+  }
+  panel(lX, lW, '#AFEEEE', mlA);
+  panel(rX, rW, '#E6E6FA', deA);
+
+  // ── ML Panel ──
+  ctx.save(); ctx.globalAlpha = mlA;
+
+  // Label
+  ctx.font = `600 ${12*f}px -apple-system,sans-serif`;
+  ctx.fillStyle = '#185FA5'; ctx.textAlign = 'center';
+  ctx.fillText('MACHINE LEARNING  (SVM)', lX + lW/2, H*0.12);
+  ctx.font = `400 ${9*f}px -apple-system,sans-serif`;
+  ctx.fillStyle = '#5a8099';
+  ctx.fillText('Ranks genes by classification power', lX + lW/2, H*0.18);
+
+  // Mini scatter
+  const sX = lX + lW/2, sY = H*0.35, sR = H*0.16;
+  const neo = [[-0.55,-0.4],[-0.65,0.1],[-0.45,0.45],[-0.7,-0.6],[-0.5,0.6],[-0.8,0.25],[-0.42,-0.2]];
+  const nor = [[0.55,-0.4],[0.65,0.1],[0.45,0.45],[0.7,-0.6],[0.5,0.6],[0.8,0.25],[0.42,-0.2]];
+  neo.forEach(([dx,dy]) => {
+    ctx.beginPath(); ctx.arc(sX+dx*sR, sY+dy*sR, 4*f, 0, Math.PI*2);
+    ctx.fillStyle='#E6E6FA'; ctx.strokeStyle='#7F77DD'; ctx.lineWidth=1.2*f; ctx.fill(); ctx.stroke();
+  });
+  nor.forEach(([dx,dy]) => {
+    ctx.beginPath(); ctx.arc(sX+dx*sR, sY+dy*sR, 4*f, 0, Math.PI*2);
+    ctx.fillStyle='#AFEEEE'; ctx.strokeStyle='#185FA5'; ctx.lineWidth=1.2*f; ctx.fill(); ctx.stroke();
+  });
+  // SVM line
+  ctx.beginPath(); ctx.moveTo(sX, sY-sR-8*f); ctx.lineTo(sX, sY+sR+8*f);
+  ctx.strokeStyle='#98FF98'; ctx.lineWidth=2.5*f; ctx.setLineDash([]); ctx.stroke();
+  ctx.font = `600 ${8*f}px -apple-system,sans-serif`;
+  ctx.fillStyle='#27500A'; ctx.textAlign='center';
+  ctx.fillText('decision boundary', sX, sY+sR+20*f);
+
+  // ML gene bars
+  ctx.textAlign='left';
+  ML_ORDER.forEach((gi, rank) => {
+    const bW = lW * 0.62 * (1 - rank*0.1);
+    const bX = lX + lW*0.06;
+    const bY = barTop + rank*barGap;
+    const top = rank < 5;
+    ctx.fillStyle = top ? 'rgba(152,255,152,0.3)' : 'rgba(175,238,238,0.15)';
+    ctx.beginPath(); ctx.roundRect(bX, bY, bW, barH, 3*f); ctx.fill();
+    ctx.fillStyle = top ? '#27500A' : '#5a8099';
+    ctx.font = `${top?600:400} ${9*f}px -apple-system,sans-serif`;
+    ctx.fillText(MLDE_GENES[gi], bX + bW + 5*f, bY + barH*0.75);
+    if (rank === 0) {
+      ctx.font = `600 ${8*f}px -apple-system,sans-serif`;
+      ctx.fillStyle = '#5a8099'; ctx.textAlign = 'right';
+      ctx.fillText('coeff →', bX - 3*f, bY + barH*0.75);
+      ctx.textAlign = 'left';
+    }
+  });
+
+  ctx.restore();
+
+  // ── DE Panel ──
+  ctx.save(); ctx.globalAlpha = deA;
+
+  ctx.font = `600 ${12*f}px -apple-system,sans-serif`;
+  ctx.fillStyle = '#3C3489'; ctx.textAlign = 'center';
+  ctx.fillText('DIFFERENTIAL EXPRESSION', rX + rW/2, H*0.12);
+  ctx.font = `400 ${9*f}px -apple-system,sans-serif`;
+  ctx.fillStyle = '#5a8099';
+  ctx.fillText('Ranks genes by biological difference', rX + rW/2, H*0.18);
+
+  // Two group boxes
+  const bxY = H*0.22, bxH = H*0.2, bxW = lW*0.22;
+  const b1X = rX + rW*0.2, b2X = rX + rW*0.55;
+  ctx.fillStyle='rgba(230,230,250,0.45)'; ctx.strokeStyle='#7F77DD'; ctx.lineWidth=1.2*f;
+  ctx.beginPath(); ctx.roundRect(b1X, bxY, bxW, bxH, 4*f); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='rgba(175,238,238,0.45)'; ctx.strokeStyle='#185FA5';
+  ctx.beginPath(); ctx.roundRect(b2X, bxY, bxW, bxH, 4*f); ctx.fill(); ctx.stroke();
+  ctx.font = `500 ${8.5*f}px -apple-system,sans-serif`; ctx.fillStyle='#3C3489'; ctx.textAlign='center';
+  ctx.fillText('Neoplastic', b1X+bxW/2, bxY+bxH+12*f);
+  ctx.fillStyle='#185FA5'; ctx.fillText('Normal', b2X+bxW/2, bxY+bxH+12*f);
+  // Arrow
+  const arY = bxY + bxH/2;
+  ctx.strokeStyle='#E05555'; ctx.lineWidth=1.5*f;
+  ctx.beginPath(); ctx.moveTo(b1X+bxW+3*f, arY); ctx.lineTo(b2X-3*f, arY); ctx.stroke();
+  ctx.font=`600 ${8*f}px -apple-system,sans-serif`; ctx.fillStyle='#791F1F'; ctx.textAlign='center';
+  ctx.fillText('log₂FC', (b1X+bxW+b2X)/2, arY-5*f);
+
+  // DE gene bars (different order)
+  ctx.textAlign='left';
+  DE_ORDER.forEach((gi, rank) => {
+    const bW = rW * 0.62 * (1 - rank*0.1);
+    const bX = rX + rW*0.06;
+    const bY = barTop + rank*barGap;
+    const top = rank < 5;
+    ctx.fillStyle = top ? 'rgba(230,230,250,0.4)' : 'rgba(175,238,238,0.12)';
+    ctx.beginPath(); ctx.roundRect(bX, bY, bW, barH, 3*f); ctx.fill();
+    ctx.fillStyle = top ? '#3C3489' : '#5a8099';
+    ctx.font = `${top?600:400} ${9*f}px -apple-system,sans-serif`;
+    ctx.fillText(MLDE_GENES[gi], bX + bW + 5*f, bY + barH*0.75);
+    if (rank === 0) {
+      ctx.font = `600 ${8*f}px -apple-system,sans-serif`;
+      ctx.fillStyle='#5a8099'; ctx.textAlign='right';
+      ctx.fillText('fold-change →', bX - 3*f, bY + barH*0.75);
+      ctx.textAlign='left';
+    }
+  });
+
+  ctx.restore();
+
+  // ── Convergence lines ──
+  if (conA > 0) {
+    ctx.save(); ctx.globalAlpha = conA;
+    ctx.setLineDash([3*f, 3*f]);
+
+    ML_ORDER.forEach((gi, mlRank) => {
+      if (!SHARED.has(gi)) return;
+      const deRank = DE_ORDER.indexOf(gi);
+      const mlY = barTop + mlRank*barGap + barH/2;
+      const deY = barTop + deRank*barGap + barH/2;
+      const mlBarW = lW * 0.62 * (1 - mlRank*0.1);
+      const x1 = lX + lW*0.06 + mlBarW + 4*f;
+      const x2 = rX + rW*0.06;
+      ctx.beginPath();
+      ctx.moveTo(x1, mlY);
+      ctx.bezierCurveTo(x1+(x2-x1)*0.35, mlY, x1+(x2-x1)*0.65, deY, x2, deY);
+      ctx.strokeStyle = 'rgba(152,255,152,0.55)'; ctx.lineWidth = 1.5*f;
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+    ctx.restore();
+  }
+
+  // ── Centre badge ──
+  if (badA > 0) {
+    ctx.save(); ctx.globalAlpha = badA;
+    const bX = W/2, bY = H*0.62;
+    const bRW = 80*f, bRH = 52*f;
+    // Glow
+    ctx.shadowColor = '#98FF98'; ctx.shadowBlur = 14*f;
+    ctx.fillStyle = 'rgba(152,255,152,0.15)';
+    ctx.strokeStyle = '#98FF98'; ctx.lineWidth = 1.8*f;
+    ctx.beginPath(); ctx.roundRect(bX-bRW/2, bY-bRH/2, bRW, bRH, 8*f); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.font = `600 ${20*f}px -apple-system,sans-serif`;
+    ctx.fillStyle = '#2D2D2D'; ctx.textAlign = 'center';
+    ctx.fillText('18 / 20', bX, bY+5*f);
+    ctx.font = `500 ${8.5*f}px -apple-system,sans-serif`;
+    ctx.fillStyle = '#5a8099';
+    ctx.fillText('genes converge', bX, bY+20*f);
+    ctx.restore();
+  }
+
+  // ── Centre label (always visible once both panels in) ──
+  const bothA = Math.min(mlA, deA);
+  if (bothA > 0) {
+    ctx.save(); ctx.globalAlpha = bothA * 0.7;
+    ctx.font = `600 ${9*f}px -apple-system,sans-serif`;
+    ctx.fillStyle = '#5a8099'; ctx.textAlign = 'center';
+    ctx.fillText('independent', W/2, H*0.46);
+    ctx.fillText('methods', W/2, H*0.53);
+    // Small arrows pointing left and right
+    ctx.strokeStyle = '#AFEEEE'; ctx.lineWidth = 1.2*f;
+    ctx.beginPath(); ctx.moveTo(W/2-30*f, H*0.49); ctx.lineTo(W/2-12*f, H*0.49); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W/2+12*f, H*0.49); ctx.lineTo(W/2+30*f, H*0.49); ctx.stroke();
+    ctx.restore();
+  }
+}
+
 // ─── BTN Hallmarks Animation ─────────────────────────────────────────────────
 var btnRAF = null;
 var btnTimers = [];
